@@ -287,8 +287,16 @@ public:
       }
     }
     else if (Value.isComplex()) {
-      if (SEEC_CLANG_DEBUG)
-        llvm::errs() << "complex: not supported!\n";
+      auto const Vals = Value.getComplexVal();
+      if (Vals.first && Vals.second) {
+        MDStmtMappings.push_back(
+          MDWriter.getMetadataFor(
+            ::seec::clang::StmtMapping::forRValScalar(S, Vals.first,
+                                                         Vals.second)));
+      }
+      else if (SEEC_CLANG_DEBUG) {
+        llvm::errs() << "complex: null values in getComplexVal()!\n";
+      }
     }
     else if (Value.isAggregate()) {
       if (llvm::Value *Addr = Value.getAggregateAddr()) {
